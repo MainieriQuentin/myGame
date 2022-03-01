@@ -1,6 +1,12 @@
 function love.load()
+  camera = require 'libraries/camera'
+  cam = camera()
+
   anim8 = require 'libraries/anim8' --Love compatibilité animate --
   love.graphics.setDefaultFilter("nearest", "nearest")
+
+  sti = require 'libraries/sti'
+  gameMap = sti('maps/testMap.lua')
 
 
   player = {}
@@ -34,7 +40,7 @@ function love.update(dt)
     isMoving = true                                                -- Le + indique que l'on peut se diriger vers la droite --
   end
 
-  if love.keyboard.isDown("left") then -- Lorsqu'on appuie sur la flèche gauche, le csprit bouge à gauche --
+  if love.keyboard.isDown("left") then -- Lorsqu'on appuie sur la flèche gauche, le sprit bouge à gauche --
     player.x = player.x - player.speed
     player.anim = player.animations.left
     isMoving = true 
@@ -58,10 +64,15 @@ function love.update(dt)
     end
 
     player.anim:update(dt)
+
+    cam:lookAt(player.x, player.y)
 end
 
 function love.draw()
-  love.graphics.draw(background, 0, 0)      -- L'ordre est important, le back 1er et sprit 2nd--
-  player.anim:draw(player.spriteSheet, player.x, player.y, nil, 8)
+  cam:attach()
+    gameMap:drawLayer(gameMap.layers["Ground"]) 
+    gameMap:drawLayer(gameMap.layers["Trees"])     -- L'ordre est important, le back 1er et sprit 2nd--
+    player.anim:draw(player.spriteSheet, player.x, player.y, nil, 6)
+  cam:detach()
 
 end
